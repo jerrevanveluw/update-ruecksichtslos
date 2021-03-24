@@ -2,13 +2,17 @@ export type Reader = () => Promise<Package>;
 export type Writer = (data: string) => void;
 export type Executor = (name: string) => Promise<VersionDefs>;
 
-export type Package = { dependencies: Dependencies; devDependencies: Dependencies };
+export type Package = { dependencies?: Dependencies; devDependencies?: Dependencies; peerDependencies?: Dependencies };
 
-export type Dependencies = { key: string; value: string };
+export interface Dependencies {
+  [key: string]: string;
+}
+
 export type VersionDef = readonly [string, string];
 export type VersionDefs = readonly [string, string[]];
 
-const read = (reader: Reader) => reader();
+type Mapper = (p: Package) => Dependencies | undefined;
+type Prefix = '^' | '~' | '';
 
 const checkVersion = (version: string | undefined) => version && Array.from(version.split('.').join('')).map(parseFloat).filter(Number.isNaN).length === 0;
 
@@ -18,36 +22,44 @@ const findLatestVersion = (versions: string[]): string => {
   return checkVersion(version) ? version : findLatestVersion(versions);
 };
 
-const extractDeps = (dev: boolean) => ({ dependencies, devDependencies }: Package) => (dev ? devDependencies : dependencies);
-
-const depsToEntries = (caret: boolean) => (executor: Executor) => (deps: Dependencies) => {
-  const updatedDeps = Promise.all(Object.keys(deps).map(executor)).then(it => it.map(([name, versions]) => [name, findLatestVersion(versions)] as const).map(([name, version]) => [name, caret ? `^${version}` : version] as VersionDef));
-  return deps ? updatedDeps : Promise.resolve([] as VersionDef[]);
-};
-
-const fromEntries = (versions: VersionDef[]) =>
-  versions.reduce(
-    (acc, cur) => ({
-      ...acc,
-      [cur[0]]: cur[1],
-    }),
-    {} as Dependencies,
-  );
-
-const compose = ([pack, dependencies, devDependencies]: [Package, Dependencies, Dependencies]): Package => ({
+const compose = ([pack, dependencies, devDependencies, peerDependencies]: [Package, Dependencies, Dependencies, Dependencies]): Package => ({
   ...pack,
   devDependencies,
   dependencies,
+  peerDependencies,
 });
 
 const stringify = (it: Package): string => `${JSON.stringify(it, null, 2)}\n`;
 
+const isFileRef = (s: string): boolean => s.includes('file://');
+
+const read = (reader: Reader, executor: Executor, mapper: Mapper, prefix: Prefix = '') => {
+  const fileRefs: VersionDef[] = [];
+  const alsoStoreFileRef = (entry: [string, string]): [string, string] => {
+    if (isFileRef(entry[1])) fileRefs.push(entry);
+    return entry;
+  };
+  return reader()
+    .then(mapper)
+    .then(it => (it ? it : {}))
+    .then(Object.entries)
+    .then(it => it.map(alsoStoreFileRef))
+    .then(it => it.filter(([_, value]) => !isFileRef(value)))
+    .then(Object.fromEntries)
+    .then(Object.keys)
+    .then(it => Promise.all(it.map(executor)))
+    .then(it => it.map(([name, versions]) => [name, findLatestVersion(versions)] as const))
+    .then(it => it.map(([name, version]) => [name, `${prefix}${version}`] as VersionDef))
+    .then(it => [...it, ...fileRefs])
+    .then(Object.fromEntries);
+};
+
 export const Update = (reader: Reader, executor: Executor, writer: Writer) => {
-  const packageJson = read(reader);
+  const deps = read(reader, executor, ({ dependencies }) => dependencies);
 
-  const deps = read(reader).then(extractDeps(false)).then(depsToEntries(false)(executor)).then(fromEntries);
+  const devDeps = read(reader, executor, ({ devDependencies }) => devDependencies, '^');
 
-  const devDeps = read(reader).then(extractDeps(true)).then(depsToEntries(true)(executor)).then(fromEntries);
+  const peerDeps = read(reader, executor, ({ peerDependencies }) => peerDependencies, '~');
 
-  Promise.all([packageJson, deps, devDeps]).then(compose).then(stringify).then(writer);
+  Promise.all([reader(), deps, devDeps, peerDeps]).then(compose).then(stringify).then(writer);
 };

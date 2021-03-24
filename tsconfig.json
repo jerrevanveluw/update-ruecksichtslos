@@ -10,5 +10,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "./test/",
+    "./node_modules/",
+    "./dist/"
+  ]
 }
