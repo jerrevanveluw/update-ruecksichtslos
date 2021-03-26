@@ -11,7 +11,7 @@ const executor: Executor = name =>
   Deno.run({ cmd: ['npm', 'view', name, 'versions'], stdout: 'piped', stderr: 'piped' })
     .output()
     .then(decode)
-    .then((it: string) => it.replace(/'/g, '"'))
+    .then(it => it.replace(/'/g, '"'))
     .then(JSON.parse)
     .then(it => [name, it] as const);
 

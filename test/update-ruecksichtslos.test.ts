@@ -9,14 +9,13 @@ mocha.setup({ ui: 'bdd', reporter: 'spec' });
 // @ts-ignore
 mocha.checkLeaks();
 
-const createReader = ({ dependencies, devDependencies, peerDependencies }: Package = {}) => () =>
-  Promise.resolve({
-    dependencies,
-    devDependencies,
-    peerDependencies,
-  });
+const createReader = ({ dependencies, devDependencies, peerDependencies }: Package = {}) => async () => ({
+  dependencies,
+  devDependencies,
+  peerDependencies,
+});
 
-const executor = (name: string) => Promise.resolve([name, ['0.0.1', '0.2.4', '1.0.0-rc']] as readonly [string, string[]]);
+const executor = async (name: string) => [name, ['0.0.1', '0.2.4', '1.0.0-rc']] as readonly [string, string[]];
 
 const checkVersionError = (e: Error) => expect(e.message).toBe('No more versions to check...');
 
@@ -64,7 +63,7 @@ describe('But it could go wrong, for example when', async () => {
   it('there are no versions', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
-      name => Promise.resolve([name, []]),
+      async name => [name, []],
       _ => {},
     ).catch(checkVersionError);
   });
@@ -73,7 +72,7 @@ describe('But it could go wrong, for example when', async () => {
   it('there are only versions with text', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
-      name => Promise.resolve([name, ['1.0.0-rc']]),
+      async name => [name, ['1.0.0-rc']],
       _ => {},
     ).catch(checkVersionError);
   });

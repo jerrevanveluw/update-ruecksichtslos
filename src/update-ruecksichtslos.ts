@@ -58,7 +58,7 @@ const read = (reader: Reader, executor: Executor, mapper: Mapper, prefix: Prefix
     .then(fromEntries);
 };
 
-export const Update = async (reader: Reader, executor: Executor, writer: Writer) => {
+export const Update = (reader: Reader, executor: Executor, writer: Writer) => {
   const deps = read(reader, executor, ({ dependencies }) => dependencies);
 
   const devDeps = read(reader, executor, ({ devDependencies }) => devDependencies, '^');
