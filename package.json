@@ -1,11 +1,9 @@
 {
   "name": "update-ruecksichtslos",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Reads your package.json and finds the latest versions for your dependencies",
   "main": "dist/index.node.js",
-  "bin": {
-    "update-ruecksichtslos": "dist/index.node.js"
-  },
+  "bin": "bin/update-ruecksichtslos",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
