@@ -2,7 +2,10 @@
   "name": "update-ruecksichtslos",
   "version": "0.0.1",
   "description": "Reads your package.json and finds the latest versions for your dependencies",
-  "main": "index.node.js",
+  "main": "dist/index.node.js",
+  "bin": {
+    "update-ruecksichtslos": "dist/index.node.js"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
@@ -12,9 +15,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/chai": "^4.2.15",
+    "@types/chai": "^4.2.16",
     "@types/mocha": "^8.2.2",
-    "@types/node": "^14.14.36",
+    "@types/node": "^14.14.37",
     "chai": "^4.3.4",
     "mocha": "^8.3.2",
     "prettier": "^2.2.1",
