@@ -16,7 +16,8 @@ type Prefix = '^' | '~' | '';
 
 type FromEntries = (entries: readonly [string, string][]) => { [k: string]: string };
 
-class VersionError extends Error {}
+class VersionError extends Error {
+}
 
 const checkVersion = (version: string | undefined) => version && Array.from(version.split('.').join('')).map(parseFloat).filter(Number.isNaN).length === 0;
 
@@ -26,12 +27,15 @@ const findLatestVersion = (versions: string[]): string => {
   return checkVersion(version) ? version : findLatestVersion(versions);
 };
 
-const compose = ([pack, dependencies, devDependencies, peerDependencies]: [Package, Dependencies, Dependencies, Dependencies]): Package => ({
-  ...pack,
-  devDependencies,
-  dependencies,
-  peerDependencies,
-});
+const compose = ([pack, dependencies, devDependencies, peerDependencies]: [Package, Dependencies, Dependencies, Dependencies]): Package => {
+  delete pack.devDependencies;
+  delete pack.dependencies;
+  delete pack.peerDependencies;
+  if (Object.keys(devDependencies).length > 0) pack.devDependencies = devDependencies;
+  if (Object.keys(dependencies).length > 0) pack.dependencies = dependencies;
+  if (Object.keys(peerDependencies).length > 0) pack.peerDependencies = peerDependencies;
+  return pack;
+};
 
 const stringify = (it: Package): string => `${JSON.stringify(it, null, 2)}\n`;
 
@@ -55,6 +59,7 @@ const read = (reader: Reader, executor: Executor, mapper: Mapper, prefix: Prefix
     .then(it => it.map(([name, versions]) => [name, findLatestVersion(versions)] as const))
     .then(it => it.map(([name, version]) => [name, `${prefix}${version}`] as VersionDef))
     .then(it => [...it, ...fileRefs])
+    .then(it => it.sort())
     .then(fromEntries);
 };
 

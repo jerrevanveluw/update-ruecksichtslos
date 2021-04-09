@@ -38,7 +38,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
   // @ts-ignore
   it('undefined dependencies', async () => {
     await Update(createReader(), executor, data => {
-      expect(JSON.parse(data).dependencies).toEqual({});
+      expect(JSON.parse(data).dependencies).toEqual(undefined);
     });
   });
 
@@ -55,6 +55,35 @@ describe('Update your package.json rücksichtslos taking into account', async ()
       expect(dependencies.localFile).toEqual('file:../../some/folder');
     });
   });
+
+  // @ts-ignore
+  it('sorting', async () => {
+    const dependencies = {
+      someDependencyB: '0.0.1',
+      someDependencyA: '0.0.1',
+    };
+
+    await Update(createReader({ dependencies }), executor, data => {
+      const { dependencies } = JSON.parse(data);
+      const [A, B] = Object.keys(dependencies);
+      expect(A).toEqual('someDependencyA');
+      expect(B).toEqual('someDependencyB');
+    });
+  });
+
+  // @ts-ignore
+  it('removing empty dependency objects', async () => {
+    const dependencies = {'someDependency':'0.0.1'};
+    const devDependencies = {};
+    const peerDependencies = {};
+
+    await Update(createReader({ dependencies, devDependencies, peerDependencies }), executor, data => {
+      const {dependencies, devDependencies, peerDependencies} = JSON.parse(data)
+      expect(dependencies.someDependency).toEqual('0.2.4');
+      expect(devDependencies).toEqual(undefined);
+      expect(peerDependencies).toEqual(undefined);
+    });
+  })
 });
 
 // @ts-ignore
@@ -64,7 +93,8 @@ describe('But it could go wrong, for example when', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
       async name => [name, []],
-      _ => {},
+      _ => {
+      },
     ).catch(checkVersionError);
   });
 
@@ -73,7 +103,8 @@ describe('But it could go wrong, for example when', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
       async name => [name, ['1.0.0-rc']],
-      _ => {},
+      _ => {
+      },
     ).catch(checkVersionError);
   });
 });

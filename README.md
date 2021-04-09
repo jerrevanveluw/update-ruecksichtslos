@@ -8,8 +8,13 @@ a `^` (caret), and your peerDependencies will be prefixed with `~`.
 npm install --save-dev update-ruecksichtslos
 ```
 
-## Using deno?
-Run:
+## Just run it
+### Node
+```shell
+npx update-ruecksichtslos
+```
+
+### Deno
 ```shell
 deno run -r --allow-read --allow-run --allow-write https://raw.githubusercontent.com/jerrevanveluw/update-ruecksichtslos/master/src/index.deno.ts
 ```

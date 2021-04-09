@@ -2,6 +2,7 @@
   "name": "update-ruecksichtslos",
   "version": "0.0.2",
   "description": "Reads your package.json and finds the latest versions for your dependencies",
+  "repository": "github:jerrevanveluw/update-ruecksichtslos",
   "main": "dist/index.node.js",
   "bin": "bin/update-ruecksichtslos",
   "scripts": {
@@ -21,8 +22,6 @@
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
-  },
-  "dependencies": {},
-  "peerDependencies": {}
+    "typescript": "^4.2.4"
+  }
 }
