@@ -16,8 +16,7 @@ type Prefix = '^' | '~' | '';
 
 type FromEntries = (entries: readonly [string, string][]) => { [k: string]: string };
 
-class VersionError extends Error {
-}
+class VersionError extends Error {}
 
 const checkVersion = (version: string | undefined) => version && Array.from(version.split('.').join('')).map(parseFloat).filter(Number.isNaN).length === 0;
 
@@ -28,9 +27,9 @@ const findLatestVersion = (versions: string[]): string => {
 };
 
 const compose = ([pack, dependencies, devDependencies, peerDependencies]: [Package, Dependencies, Dependencies, Dependencies]): Package => {
-  delete pack.devDependencies;
-  delete pack.dependencies;
-  delete pack.peerDependencies;
+  if (pack.devDependencies && Object.keys(pack.devDependencies as {}).length === 0) delete pack.devDependencies;
+  if (pack.dependencies && Object.keys(pack.dependencies as {}).length === 0) delete pack.dependencies;
+  if (pack.peerDependencies && Object.keys(pack.peerDependencies as {}).length === 0) delete pack.peerDependencies;
   if (Object.keys(devDependencies).length > 0) pack.devDependencies = devDependencies;
   if (Object.keys(dependencies).length > 0) pack.dependencies = dependencies;
   if (Object.keys(peerDependencies).length > 0) pack.peerDependencies = peerDependencies;

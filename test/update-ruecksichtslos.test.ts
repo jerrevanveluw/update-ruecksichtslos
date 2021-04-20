@@ -73,17 +73,29 @@ describe('Update your package.json rücksichtslos taking into account', async ()
 
   // @ts-ignore
   it('removing empty dependency objects', async () => {
-    const dependencies = {'someDependency':'0.0.1'};
+    const dependencies = { someDependency: '0.0.1' };
     const devDependencies = {};
     const peerDependencies = {};
 
     await Update(createReader({ dependencies, devDependencies, peerDependencies }), executor, data => {
-      const {dependencies, devDependencies, peerDependencies} = JSON.parse(data)
+      const { dependencies, devDependencies, peerDependencies } = JSON.parse(data);
       expect(dependencies.someDependency).toEqual('0.2.4');
       expect(devDependencies).toEqual(undefined);
       expect(peerDependencies).toEqual(undefined);
     });
-  })
+  });
+
+  // @ts-ignore
+  it('package.json key order', async () => {
+    const reader = async () => ({ author: 'John Doe', dependencies: { someDependency: '0.0.1' } });
+
+    await Update(reader, executor, data => {
+      const packageJson = JSON.parse(data);
+      const [author, dependencies] = Object.keys(packageJson);
+      expect(author).toEqual('author');
+      expect(dependencies).toEqual('dependencies');
+    });
+  });
 });
 
 // @ts-ignore
@@ -93,8 +105,7 @@ describe('But it could go wrong, for example when', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
       async name => [name, []],
-      _ => {
-      },
+      _ => {},
     ).catch(checkVersionError);
   });
 
@@ -103,8 +114,7 @@ describe('But it could go wrong, for example when', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
       async name => [name, ['1.0.0-rc']],
-      _ => {
-      },
+      _ => {},
     ).catch(checkVersionError);
   });
 });
