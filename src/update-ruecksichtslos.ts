@@ -16,7 +16,8 @@ type Prefix = '^' | '~' | '';
 
 type FromEntries = (entries: readonly [string, string][]) => { [k: string]: string };
 
-class VersionError extends Error {}
+class VersionError extends Error {
+}
 
 const checkVersion = (version: string | undefined) => version && Array.from(version.split('.').join('')).map(parseFloat).filter(Number.isNaN).length === 0;
 
@@ -62,12 +63,12 @@ const read = (reader: Reader, executor: Executor, mapper: Mapper, prefix: Prefix
     .then(fromEntries);
 };
 
-export const Update = (reader: Reader, executor: Executor, writer: Writer) => {
-  const deps = read(reader, executor, ({ dependencies }) => dependencies);
+export const Update = (reader: Reader, executor: Executor, writer: Writer, prefix: Prefix | null = null) => {
+  const deps = read(reader, executor, ({ dependencies }) => dependencies, prefix ? prefix : '');
 
-  const devDeps = read(reader, executor, ({ devDependencies }) => devDependencies, '^');
+  const devDeps = read(reader, executor, ({ devDependencies }) => devDependencies, prefix ? prefix : '^');
 
-  const peerDeps = read(reader, executor, ({ peerDependencies }) => peerDependencies, '~');
+  const peerDeps = read(reader, executor, ({ peerDependencies }) => peerDependencies, prefix ? prefix : '^');
 
   return Promise.all([reader(), deps, devDeps, peerDeps]).then(compose).then(stringify).then(writer);
 };

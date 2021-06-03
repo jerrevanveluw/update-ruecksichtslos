@@ -31,7 +31,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
       const { dependencies, devDependencies, peerDependencies } = JSON.parse(data);
       expect(dependencies.someDependency).toBe('0.2.4');
       expect(devDependencies.someDevDependency).toBe('^0.2.4');
-      expect(peerDependencies.somePeerDependency).toBe('~0.2.4');
+      expect(peerDependencies.somePeerDependency).toBe('^0.2.4');
     });
   });
 

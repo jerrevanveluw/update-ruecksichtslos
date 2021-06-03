@@ -6,7 +6,14 @@ import { Executor, Reader, Update, Writer } from './update-ruecksichtslos';
 
 const execute = promisify(exec);
 
-const packageJsonFile = join(process.cwd(), 'package.json');
+const { argv, cwd } = process;
+
+const caret = argv.includes('--caret') ? '^' : null;
+const tilde = argv.includes('--tilde') ? '~' : null;
+if (caret && tilde) console.warn('Warning "--caret" and "--tilde" found as arguments. Picking "--tilde"');
+const prefix = tilde ? tilde : caret;
+
+const packageJsonFile = join(cwd(), 'package.json');
 
 const decode = (buffer: Buffer) => buffer.toString('utf-8');
 
@@ -21,4 +28,4 @@ const executor: Executor = (name: string) =>
 
 const writer: Writer = (data: string) => writeFile(packageJsonFile, data);
 
-Update(reader, executor, writer);
+Update(reader, executor, writer, prefix);
