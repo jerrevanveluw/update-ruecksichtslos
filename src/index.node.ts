@@ -8,6 +8,8 @@ const execute = promisify(exec);
 
 const { argv, cwd } = process;
 
+console.log(argv);
+
 const caret = argv.includes('--caret') ? '^' : null;
 const tilde = argv.includes('--tilde') ? '~' : null;
 if (caret && tilde) console.warn('Warning "--caret" and "--tilde" found as arguments. Picking "--tilde"');
