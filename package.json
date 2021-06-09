@@ -1,14 +1,15 @@
 {
   "name": "update-ruecksichtslos",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Reads your package.json and finds the latest versions for your dependencies",
   "repository": "github:jerrevanveluw/update-ruecksichtslos",
   "main": "dist/index.node.js",
   "bin": "bin/update-ruecksichtslos",
   "scripts": {
-    "clean": "rimraf dist",
     "build": "npm run clean && tsc",
+    "clean": "rimraf dist",
     "deno": "deno run -r --allow-read --allow-run --allow-write src/index.deno.ts",
+    "release": "npm run build && standard-version",
     "start": "npm run build && node dist/index.node.js",
     "test": "deno run --location http://localhost:0 test/update-ruecksichtslos.test.ts"
   },
@@ -22,7 +23,45 @@
     "mocha": "^9.0.0",
     "prettier": "^2.3.1",
     "rimraf": "^3.0.2",
+    "standard-version": "^9.3.0",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.2"
+  },
+  "standard-version": {
+    "tagPrefix": "",
+    "scripts": {
+      "postchangelog": "prettier --write CHANGELOG.md"
+    },
+    "releaseCommitMessageFormat": "chore(release): bump version to {{currentTag}}",
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "chore",
+        "section": "General Changes"
+      },
+      {
+        "type": "docs",
+        "section": "Documentation"
+      },
+      {
+        "type": "refactor",
+        "section": "Code refactoring"
+      },
+      {
+        "type": "test",
+        "section": "Tests"
+      },
+      {
+        "type": "style",
+        "section": "Code styling"
+      }
+    ]
   }
 }

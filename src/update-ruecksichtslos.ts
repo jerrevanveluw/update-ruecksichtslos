@@ -123,7 +123,7 @@ function* progressGenerator(numberOfItems: number): ProgressGenerator {
   const progressBar = ' '.repeat(width).split('');
   const numberOfSteps = numberOfItems ;
   const barStep = Math.round(width / numberOfSteps);
-  const percentageStep = Math.round(100 / numberOfSteps);
+  const percentageStep = Math.floor(100 / numberOfSteps);
 
   const bar = () => `\r[${progressBar.join('')}] ${percentageStep * i++}%`;
 
