@@ -1,20 +1,23 @@
 import { join } from 'https://deno.land/std@0.88.0/path/mod.ts';
-import { Executor, Reader, Update, Writer } from './update-ruecksichtslos.ts';
+import { progressBar, Update } from './update-ruecksichtslos.ts';
 
-const { args, cwd, readTextFile, run, writeTextFile } = Deno;
+const { args, cwd, readTextFile, run, stdout, writeTextFile } = Deno;
+const { error, warn } = console;
 
 const caret = args.includes('--caret') ? '^' : null;
 const tilde = args.includes('--tilde') ? '~' : null;
-if (caret && tilde) console.warn('Warning "--caret" and "--tilde" found as arguments. Picking "--tilde"');
+if (caret && tilde) warn('Warning "--caret" and "--tilde" found as arguments. Picking "--tilde"');
 const prefix = tilde ? tilde : caret;
 
 const packageJsonFile = join(cwd(), './package.json');
 
 const decode = (buffer: Uint8Array) => new TextDecoder('utf-8').decode(buffer);
 
-const reader: Reader = () => readTextFile(packageJsonFile).then(JSON.parse);
+const encode = (string: string) => new TextEncoder().encode(string)
 
-const executor: Executor = (name: string) =>
+const reader = () => readTextFile(packageJsonFile).then(JSON.parse);
+
+const executor = (name: string) =>
   run({ cmd: ['npm', 'view', name, 'versions'], stdout: 'piped', stderr: 'piped' })
     .output()
     .then(decode)
@@ -22,6 +25,8 @@ const executor: Executor = (name: string) =>
     .then(JSON.parse)
     .then((it: any) => [name, it] as const);
 
-const writer: Writer = (data: string) => writeTextFile(packageJsonFile, data);
+const fileWriter = (data: string) => writeTextFile(packageJsonFile, data);
 
-Update(reader, executor, writer, prefix);
+const stdoutWriter = (data: string) => stdout.write(encode(data));
+
+Update(reader, executor, fileWriter, progressBar(stdoutWriter), prefix).catch(error);
