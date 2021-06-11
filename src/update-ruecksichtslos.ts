@@ -78,11 +78,10 @@ const read = (reader: Reader, executor: Executor, mapper: Mapper, log: Logger, p
     .then(fromEntries);
 };
 
-const combineDependencies = ({ dependencies, devDependencies, peerDependencies }: Package) => ({
-  ...dependencies,
-  ...devDependencies,
-  ...peerDependencies,
-});
+const countDependencies = ({ dependencies, devDependencies, peerDependencies }: Package) =>
+  (dependencies ? Object.keys(dependencies).length : 0) +
+  (devDependencies ? Object.keys(devDependencies).length : 0) +
+  (peerDependencies ? Object.keys(peerDependencies).length : 0);
 
 export const progressBar = (writer: StdoutWriter) => (progressGenerator: ProgressGenerator): ProgressBar => {
   const spacer = ' '.repeat(30);
@@ -96,7 +95,7 @@ export const progressBar = (writer: StdoutWriter) => (progressGenerator: Progres
 };
 
 export const Update = async (reader: Reader, executor: Executor, fileWriter: FileWriter, progressBarProvider: (p: ProgressGenerator) => ProgressBar, prefix: Prefix | null = null) => {
-  const numberOfDeps = await reader().then(combineDependencies).then(Object.keys).then(it => it.length);
+  const numberOfDeps = await reader().then(countDependencies);
 
   const { start, log, end } = progressBarProvider(progressGenerator(numberOfDeps));
 
@@ -120,16 +119,18 @@ function* progressGenerator(numberOfItems: number): ProgressGenerator {
   let i = 0;
 
   const width = 60;
-  const progressBar = ' '.repeat(width).split('');
-  const numberOfSteps = numberOfItems ;
-  const barStep = Math.round(width / numberOfSteps);
-  const percentageStep = Math.floor(100 / numberOfSteps);
+  const numberOfSteps = numberOfItems;
+  const barStep = width / numberOfSteps;
+  const percentageStep = 100 / numberOfSteps;
 
-  const bar = () => `\r[${progressBar.join('')}] ${percentageStep * i++}%`;
+  let progressBar = ' '.repeat(width);
+
+  const bar = () => `\r[${progressBar}] ${Math.floor(percentageStep * i)}%`;
 
   const moveBar = () => {
-    progressBar.splice(width - barStep, barStep);
-    progressBar.unshift(...'.'.repeat(barStep).split(''));
+    const filled = Math.floor(barStep * i++)
+    const empty = width - filled
+    progressBar = '.'.repeat(filled) + ' '.repeat(empty)
   };
 
   yield bar();
