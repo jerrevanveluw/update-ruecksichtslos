@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.10](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.9...0.0.10) (2021-06-11)
+
+### Bug Fixes
+
+- dependency count and progress bar steps ([c25c34d](https://github.com/jerrevanveluw/update-ruecksichtslos/commit/c25c34d64f2150f0cdd86a3a863e2cc2ab53b486))
+
 ### 0.0.9 (2021-06-09)
 
 ### Features
