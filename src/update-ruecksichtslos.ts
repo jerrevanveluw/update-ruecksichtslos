@@ -128,9 +128,9 @@ function* progressGenerator(numberOfItems: number): ProgressGenerator {
   const bar = () => `\r[${progressBar}] ${Math.floor(percentageStep * i)}%`;
 
   const moveBar = () => {
-    const filled = Math.floor(barStep * i++)
-    const empty = width - filled
-    progressBar = '.'.repeat(filled) + ' '.repeat(empty)
+    const filled = Math.floor(barStep * i++);
+    const empty = width - filled;
+    progressBar = '.'.repeat(filled) + ' '.repeat(empty);
   };
 
   yield bar();

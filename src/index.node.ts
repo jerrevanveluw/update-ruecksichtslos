@@ -24,6 +24,7 @@ const executor = (name: string) =>
   execute(`npm view ${name} versions`)
     .then(({ stdout }: { stdout: string }): string => stdout)
     .then((it: string) => it.replace(/'/g, '"'))
+    .then((it: string) => it[0] === '[' ? it : `["${it}"]`)
     .then(JSON.parse)
     .then((it: string[]) => [name, it] as const);
 

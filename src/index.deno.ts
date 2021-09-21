@@ -13,7 +13,7 @@ const packageJsonFile = join(cwd(), './package.json');
 
 const decode = (buffer: Uint8Array) => new TextDecoder('utf-8').decode(buffer);
 
-const encode = (string: string) => new TextEncoder().encode(string)
+const encode = (string: string) => new TextEncoder().encode(string);
 
 const reader = () => readTextFile(packageJsonFile).then(JSON.parse);
 
@@ -22,6 +22,7 @@ const executor = (name: string) =>
     .output()
     .then(decode)
     .then((it: string) => it.replace(/'/g, '"'))
+    .then((it: string) => it[0] === '[' ? it : `["${it}"]`)
     .then(JSON.parse)
     .then((it: any) => [name, it] as const);
 
