@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.11](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.10...0.0.11) (2021-09-21)
+
+### Features
+
+- handle single version packages ([a217441](https://github.com/jerrevanveluw/update-ruecksichtslos/commit/a21744196524d77c98d7659e6894582a6c4207f2))
+
 ### [0.0.10](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.9...0.0.10) (2021-06-11)
 
 ### Bug Fixes
