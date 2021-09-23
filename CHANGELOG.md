@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.12](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.11...0.0.12) (2021-09-23)
+
+### Code refactoring
+
+- npm view versions output as json ([01dd7f7](https://github.com/jerrevanveluw/update-ruecksichtslos/commit/01dd7f7476a0d2613df869372552be22925ffb4a))
+
 ### [0.0.11](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.10...0.0.11) (2021-09-21)
 
 ### Features
