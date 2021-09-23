@@ -21,11 +21,10 @@ const decode = (buffer: Buffer) => buffer.toString('utf-8');
 const reader = () => readFile(packageJsonFile).then(decode).then(JSON.parse);
 
 const executor = (name: string) =>
-  execute(`npm view ${name} versions`)
+  execute(`npm view ${name} versions --json`)
     .then(({ stdout }: { stdout: string }): string => stdout)
-    .then((it: string) => it.replace(/'/g, '"'))
-    .then((it: string) => it[0] === '[' ? it : `["${it}"]`)
     .then(JSON.parse)
+    .then((it: string | string[]) => Array.isArray(it) ? it : [it])
     .then((it: string[]) => [name, it] as const);
 
 const fileWriter = (data: string) => writeFile(packageJsonFile, data);

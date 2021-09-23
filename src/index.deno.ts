@@ -18,12 +18,11 @@ const encode = (string: string) => new TextEncoder().encode(string);
 const reader = () => readTextFile(packageJsonFile).then(JSON.parse);
 
 const executor = (name: string) =>
-  run({ cmd: ['npm', 'view', name, 'versions'], stdout: 'piped', stderr: 'piped' })
+  run({ cmd: ['npm', 'view', name, 'versions', '--json'], stdout: 'piped', stderr: 'piped' })
     .output()
     .then(decode)
-    .then((it: string) => it.replace(/'/g, '"'))
-    .then((it: string) => it[0] === '[' ? it : `["${it}"]`)
     .then(JSON.parse)
+    .then((it: string | string[]) => Array.isArray(it) ? it : [it])
     .then((it: any) => [name, it] as const);
 
 const fileWriter = (data: string) => writeTextFile(packageJsonFile, data);
