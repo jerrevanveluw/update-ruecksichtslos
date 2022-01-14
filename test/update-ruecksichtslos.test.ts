@@ -14,7 +14,7 @@ const createReader = ({ dependencies, devDependencies, peerDependencies }: Packa
   peerDependencies,
 });
 
-const executor = async (name: string) => [name, ['0.0.1', '0.2.4', '1.0.0-rc']] as readonly [string, string[]];
+const executor = async (name: string, version: string) => [name, version, ['0.0.1', '0.2.4', '1.0.0-rc']] as readonly [string, string, string[]];
 
 const progressBarProvider = progressBar((_: string) => {
 });
@@ -97,7 +97,7 @@ describe('But it could go wrong, for example when', async () => {
   it('there are no versions', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
-      async (name: string) => [name, []],
+      async (name: string, version: string) => [name, version, []],
       (_: string) => {
       }, progressBarProvider,
     ).catch(checkVersionError);
@@ -106,7 +106,7 @@ describe('But it could go wrong, for example when', async () => {
   it('there are only versions with text', async () => {
     Update(
       createReader({ dependencies: { someDependency: '0.0.1' } }),
-      async (name: string) => [name, ['1.0.0-rc']],
+      async (name: string, version: string) => [name, version, ['1.0.0-rc']],
       (_: string) => {
       }, progressBarProvider,
     ).catch(checkVersionError);

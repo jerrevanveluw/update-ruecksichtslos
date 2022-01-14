@@ -17,13 +17,13 @@ const encode = (string: string) => new TextEncoder().encode(string);
 
 const reader = () => readTextFile(packageJsonFile).then(JSON.parse);
 
-const executor = (name: string) =>
+const executor = (name: string, currentVersion: string) =>
   run({ cmd: ['npm', 'view', name, 'versions', '--json'], stdout: 'piped', stderr: 'piped' })
     .output()
     .then(decode)
     .then(JSON.parse)
     .then((it: string | string[]) => Array.isArray(it) ? it : [it])
-    .then((it: any) => [name, it] as const);
+    .then((it: any) => [name, currentVersion, it] as const);
 
 const fileWriter = (data: string) => writeTextFile(packageJsonFile, data);
 

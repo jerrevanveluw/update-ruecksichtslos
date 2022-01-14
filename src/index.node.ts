@@ -20,12 +20,12 @@ const decode = (buffer: Buffer) => buffer.toString('utf-8');
 
 const reader = () => readFile(packageJsonFile).then(decode).then(JSON.parse);
 
-const executor = (name: string) =>
+const executor = (name: string, currentVersion: string) =>
   execute(`npm view ${name} versions --json`)
     .then(({ stdout }: { stdout: string }): string => stdout)
     .then(JSON.parse)
     .then((it: string | string[]) => Array.isArray(it) ? it : [it])
-    .then((it: string[]) => [name, it] as const);
+    .then((it: string[]) => [name, currentVersion, it] as const);
 
 const fileWriter = (data: string) => writeFile(packageJsonFile, data);
 const stdoutWriter = (data: string) => stdout.write(data);
