@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.13](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.12...0.0.13) (2022-01-14)
+
 ### [0.0.12](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.11...0.0.12) (2021-09-23)
 
 ### Code refactoring
