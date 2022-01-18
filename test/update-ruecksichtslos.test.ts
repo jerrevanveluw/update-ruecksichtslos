@@ -19,8 +19,6 @@ const executor = async (name: string, version: string) => [name, version, ['0.0.
 const progressBarProvider = progressBar((_: string) => {
 });
 
-const checkVersionError = (e: Error) => expect(e.message).toBe('No more versions to check...');
-
 describe('Update your package.json rücksichtslos taking into account', async () => {
   it('dependencies, devDependencies, and peerDependencies', async () => {
     const dependencies = { someDependency: '0.0.1' };
@@ -93,23 +91,27 @@ describe('Update your package.json rücksichtslos taking into account', async ()
   });
 });
 
-describe('But it could go wrong, for example when', async () => {
-  it('there are no versions', async () => {
-    Update(
-      createReader({ dependencies: { someDependency: '0.0.1' } }),
+describe('Or keep the current version if there are', async () => {
+  it('no versions', async () => {
+    await Update(
+      createReader({ dependencies: { someDependency: '0.0.1-whatever' } }),
       async (name: string, version: string) => [name, version, []],
-      (_: string) => {
+      (data: string) => {
+        const { dependencies } = JSON.parse(data);
+        expect(dependencies.someDependency).toEqual('0.0.1-whatever');
       }, progressBarProvider,
-    ).catch(checkVersionError);
+    );
   });
 
-  it('there are only versions with text', async () => {
-    Update(
-      createReader({ dependencies: { someDependency: '0.0.1' } }),
+  it('only versions with text included', async () => {
+    await Update(
+      createReader({ dependencies: { someDependency: '0.0.1-whatever' } }),
       async (name: string, version: string) => [name, version, ['1.0.0-rc']],
-      (_: string) => {
+      (data: string) => {
+        const { dependencies } = JSON.parse(data);
+        expect(dependencies.someDependency).toEqual('0.0.1-whatever');
       }, progressBarProvider,
-    ).catch(checkVersionError);
+    );
   });
 });
 
