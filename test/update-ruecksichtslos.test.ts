@@ -14,7 +14,7 @@ const createReader = ({ dependencies, devDependencies, peerDependencies }: Packa
   peerDependencies,
 });
 
-const executor = async (name: string, version: string) => [name, version, ['0.0.1', '0.2.4', '1.0.0-rc']] as readonly [string, string, string[]];
+const executor = (versions: string[] = ['0.0.1', '0.2.4', '1.0.0-rc']) => async (name: string, currentVersion: string) => [name, currentVersion, [...versions]] as readonly [string, string, string[]];
 
 const progressBarProvider = progressBar((_: string) => {
 });
@@ -25,7 +25,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
     const devDependencies = { someDevDependency: '0.0.1' };
     const peerDependencies = { somePeerDependency: '0.0.1' };
 
-    await Update(createReader({ dependencies, devDependencies, peerDependencies }), executor, (data: string) => {
+    await Update(createReader({ dependencies, devDependencies, peerDependencies }), executor(), (data: string) => {
       const { dependencies, devDependencies, peerDependencies } = JSON.parse(data);
       expect(dependencies.someDependency).toBe('0.2.4');
       expect(devDependencies.someDevDependency).toBe('^0.2.4');
@@ -34,7 +34,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
   });
 
   it('undefined dependencies', async () => {
-    await Update(createReader(), executor, (data: string) => {
+    await Update(createReader(), executor(), (data: string) => {
       expect(JSON.parse(data).dependencies).toEqual(undefined);
     }, progressBarProvider);
   });
@@ -45,7 +45,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
       localFile: 'file:../../some/folder',
     };
 
-    await Update(createReader({ dependencies }), executor, (data: string) => {
+    await Update(createReader({ dependencies }), executor(), (data: string) => {
       const { dependencies } = JSON.parse(data);
       expect(dependencies.someDependency).toEqual('0.2.4');
       expect(dependencies.localFile).toEqual('file:../../some/folder');
@@ -58,7 +58,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
       someDependencyA: '0.0.1',
     };
 
-    await Update(createReader({ dependencies }), executor, (data: string) => {
+    await Update(createReader({ dependencies }), executor(), (data: string) => {
       const { dependencies } = JSON.parse(data);
       const [A, B] = Object.keys(dependencies);
       expect(A).toEqual('someDependencyA');
@@ -71,7 +71,7 @@ describe('Update your package.json rücksichtslos taking into account', async ()
     const devDependencies = {};
     const peerDependencies = {};
 
-    await Update(createReader({ dependencies, devDependencies, peerDependencies }), executor, (data: string) => {
+    await Update(createReader({ dependencies, devDependencies, peerDependencies }), executor(), (data: string) => {
       const { dependencies, devDependencies, peerDependencies } = JSON.parse(data);
       expect(dependencies.someDependency).toEqual('0.2.4');
       expect(devDependencies).toEqual(undefined);
@@ -82,23 +82,41 @@ describe('Update your package.json rücksichtslos taking into account', async ()
   it('package.json key order', async () => {
     const reader = async () => ({ author: 'John Doe', dependencies: { someDependency: '0.0.1' } });
 
-    await Update(reader, executor, (data: string) => {
+    await Update(reader, executor(), (data: string) => {
       const packageJson = JSON.parse(data);
       const [author, dependencies] = Object.keys(packageJson);
       expect(author).toEqual('author');
       expect(dependencies).toEqual('dependencies');
     }, progressBarProvider);
   });
+
+  it('current version prefix', async () => {
+    const dependencies = { someDependency: '^0.0.1' };
+    await Update(
+      createReader({ dependencies }),
+      executor([]),
+      (data: string) => {
+        const { someDependency } = JSON.parse(data).dependencies;
+        expect(someDependency).toEqual('0.0.1');
+      }, progressBarProvider);
+  });
 });
 
 describe('Or keep the current version if there are', async () => {
   it('no versions', async () => {
+    const dependencies = {
+      someCaretDependency: '^0.0.1-caret',
+      someTildeDependency: '~0.0.1-tilde',
+      someOtherDependency: '0.0.1-whatever',
+    };
     await Update(
-      createReader({ dependencies: { someDependency: '0.0.1-whatever' } }),
-      async (name: string, version: string) => [name, version, []],
+      createReader({ dependencies }),
+      executor([]),
       (data: string) => {
-        const { dependencies } = JSON.parse(data);
-        expect(dependencies.someDependency).toEqual('0.0.1-whatever');
+        const { someCaretDependency, someTildeDependency, someOtherDependency } = JSON.parse(data).dependencies;
+        expect(someCaretDependency).toEqual('0.0.1-caret');
+        expect(someTildeDependency).toEqual('0.0.1-tilde');
+        expect(someOtherDependency).toEqual('0.0.1-whatever');
       }, progressBarProvider,
     );
   });
@@ -106,7 +124,7 @@ describe('Or keep the current version if there are', async () => {
   it('only versions with text included', async () => {
     await Update(
       createReader({ dependencies: { someDependency: '0.0.1-whatever' } }),
-      async (name: string, version: string) => [name, version, ['1.0.0-rc']],
+      executor(['1.0.0-rc']),
       (data: string) => {
         const { dependencies } = JSON.parse(data);
         expect(dependencies.someDependency).toEqual('0.0.1-whatever');

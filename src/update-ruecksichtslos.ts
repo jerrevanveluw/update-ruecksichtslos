@@ -48,7 +48,12 @@ const isFileRef = (entry: [string, string]): boolean => entry[1].includes('file:
 
 const fromEntries: FromEntries = entries => entries.reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
-const parallel = (executor: Executor, logger: Logger) => (dependencies: [string, string][]) => Promise.all(dependencies.map(([name, version]) => executor(name, version).then(it => {
+const removePrefix = (version: string) => {
+  const hasPrefix = version[0] === ('~') || version[0] === ('^');
+  return hasPrefix ? version.substring(1) : version;
+};
+
+const parallel = (executor: Executor, logger: Logger) => (dependencies: [string, string][]) => Promise.all(dependencies.map(([name, version]) => executor(name, removePrefix(version)).then(it => {
   logger(name);
   return it;
 })));
@@ -67,7 +72,7 @@ const read = (reader: Reader, executor: Executor, mapper: Mapper, logger: Logger
     .then(Object.entries)
     .then(it => it.map(alsoStoreFileRef).filter(entry => !isFileRef(entry)))
     .then(parallel(executor, logger))
-    .then(it => it.map(([name, version, versions]) => [name, findLatestVersion(version, versions)] as const))
+    .then(it => it.map(([name, currentVersion, versions]) => [name, findLatestVersion(currentVersion, versions)] as const))
     .then(it => it.map(([name, version]) => [name, `${prefix}${version}`] as VersionDef))
     .then(it => [...it, ...fileRefs])
     .then(it => it.sort())
