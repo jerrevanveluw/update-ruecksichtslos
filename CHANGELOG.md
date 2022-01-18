@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.15](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.13...0.0.15) (2022-01-18)
+
+### General Changes
+
+- **release:** bump version to 0.0.14 ([fcaf33b](https://github.com/jerrevanveluw/update-ruecksichtslos/commit/fcaf33bceaf115d66cd87962f8e0585c9b00a949))
+
 ### [0.0.14](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.13...0.0.14) (2022-01-14)
 
 ### [0.0.13](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.12...0.0.13) (2022-01-14)
