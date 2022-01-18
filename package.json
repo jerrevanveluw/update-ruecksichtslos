@@ -1,6 +1,6 @@
 {
   "name": "update-ruecksichtslos",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Reads your package.json and finds the latest versions for your dependencies",
   "repository": "github:jerrevanveluw/update-ruecksichtslos",
   "main": "dist/index.node.js",
