@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.17](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.16...0.0.17) (2022-01-23)
+
 ### [0.0.16](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.15...0.0.16) (2022-01-18)
 
 ### [0.0.15](https://github.com/jerrevanveluw/update-ruecksichtslos/compare/0.0.13...0.0.15) (2022-01-18)
