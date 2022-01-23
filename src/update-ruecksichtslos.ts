@@ -26,10 +26,10 @@ type FromEntries = (entries: readonly [string, string][]) => { [k: string]: stri
 
 const checkVersion = (version: string | undefined) => version && Array.from(version.split('.').join('')).map(parseFloat).filter(Number.isNaN).length === 0;
 
-const findLatestVersion = (currentVersion: string, versions: string[]): string => {
+const findLatestVersion = (current: string, versions: string[]): string => {
   const version = versions.pop();
-  if (!version) return currentVersion;
-  return checkVersion(version) ? version : findLatestVersion(currentVersion, versions);
+  if (!version) return current;
+  return checkVersion(version) ? version : findLatestVersion(current, versions);
 };
 
 const compose = ([pack, dependencies, devDependencies, peerDependencies]: [Package, Dependencies, Dependencies, Dependencies]): Package => {

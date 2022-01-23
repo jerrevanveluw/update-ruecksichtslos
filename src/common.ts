@@ -10,3 +10,7 @@ export const determinePrefix = (args: string[], warn: (message: string) => void)
 };
 
 export const npmViewPackageCommand = (name: string) => ['npm', 'view', name, 'versions', '--json'];
+
+export const parseWith = (name: string, currentVersion: string) => (data: string) => Promise.resolve(JSON.parse(data))
+  .then((it: string | string[]) => Array.isArray(it) ? it : [it])
+  .then((it: any) => [name, currentVersion, it] as const);

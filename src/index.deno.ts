@@ -1,6 +1,6 @@
 import { join } from 'https://deno.land/std@0.121.0/path/mod.ts';
 import { progressBar, Update } from './update-ruecksichtslos.ts';
-import { determinePrefix, encoding, npmViewPackageCommand, packageFile } from './common.ts';
+import { determinePrefix, encoding, npmViewPackageCommand, packageFile, parseWith } from './common.ts';
 
 const { args, cwd, readTextFile, run, stdout, writeTextFile } = Deno;
 const { error, warn } = console;
@@ -19,9 +19,7 @@ const executor = (name: string, currentVersion: string) =>
   run({ cmd: npmViewPackageCommand(name), stdout: 'piped', stderr: 'piped' })
     .output()
     .then(decode)
-    .then(JSON.parse)
-    .then((it: string | string[]) => Array.isArray(it) ? it : [it])
-    .then((it: any) => [name, currentVersion, it] as const);
+    .then(parseWith(name, currentVersion));
 
 const fileWriter = (data: string) => writeTextFile(packageJsonFile, data);
 

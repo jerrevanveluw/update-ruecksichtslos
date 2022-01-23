@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { exec } from 'child_process';
 import { join } from 'path';
 import { progressBar, Update } from './update-ruecksichtslos';
-import { determinePrefix, encoding, npmViewPackageCommand, packageFile } from './common';
+import { determinePrefix, encoding, npmViewPackageCommand, packageFile, parseWith } from './common';
 
 const execute = promisify(exec);
 
@@ -21,9 +21,7 @@ const reader = () => readFile(packageJsonFile).then(decode).then(JSON.parse);
 const executor = (name: string, currentVersion: string) =>
   execute(npmViewPackageCommand(name).join(' '))
     .then(({ stdout }: { stdout: string }): string => stdout)
-    .then(JSON.parse)
-    .then((it: string | string[]) => Array.isArray(it) ? it : [it])
-    .then((it: string[]) => [name, currentVersion, it] as const);
+    .then(parseWith(name, currentVersion));
 
 const fileWriter = (data: string) => writeFile(packageJsonFile, data);
 const stdoutWriter = (data: string) => stdout.write(data);

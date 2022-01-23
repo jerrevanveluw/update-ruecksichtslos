@@ -1,5 +1,4 @@
-.npmrc
 .idea/
-node_modules/
+bin/
 dist/
-index.js
+node_modules/
