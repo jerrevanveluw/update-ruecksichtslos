@@ -1,4 +1,4 @@
-import { join } from 'https://deno.land/std@0.121.0/path/mod.ts';
+import { join } from 'https://deno.land/std@0.224.0/path/mod.ts';
 import { progressBar, Update } from './update-ruecksichtslos.ts';
 import { determinePrefix, encoding, npmViewPackageCommand, packageFile, parseWith } from './common.ts';
 
